@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Phylogenetic analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Mapping on reference genome set
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="mapping.html">Scripts</a>
+    </li>
+    <li>
+      <a href="mapping_results.html">Mapping table</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Unmapped analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="unmapped.html">Scripts</a>
+    </li>
+    <li>
+      <a href="by_sample-report.html">Centrifuge results by sample</a>
+    </li>
+    <li>
+      <a href="all-report.html">Centrifuge results pooled</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="phylogeny.html">Phylogenetic analysis</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Phylogenetic analysis</h1>
+
+</div>
+
+
+<div id="phylogenetic-analyses-of-symbiont-genomes" class="section level1">
+<h1>Phylogenetic analyses of symbiont genomes</h1>
+<p>Two step process :</p>
+<ul>
+<li>Variant calling on reference genomes (run on cluster)</li>
+<li>Phylogenetic analysis, either by whole genome neighbor joining if no annotation is available, or by gene set selection and Maximum Likelyhood phylogenetic inference (run locally)</li>
+</ul>
+<div id="variant-detection" class="section level3">
+<h3>Variant detection</h3>
+<div id="running-samtools-mpileup" class="section level4 tabset">
+<h4>Running <em>samtools mpileup</em></h4>
+<p><code>Samtools mpileup</code> is used to deetct variants in all samples with sufficient coverage.</p>
+<p>The resulting bcf files is then post-treated :</p>
+<ul>
+<li><code>vcffilter</code> is used to remove variants with more than 2 alleles and some uncovered variants</li>
+<li>If necessary, an outgroup is generated by a mummer alignment converted to vcf, and merged to the main vcf file (see below).</li>
+<li>DPR field (read coverage) is extracted using <code>bcftools</code> and written in a tsv file for easier parsing in R</li>
+<li>Some cleaning is made, mainly in the file header</li>
+</ul>
+<p>Commands for each genome :</p>
+<div id="buchnera" class="section level5">
+<h5> Buchnera</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f buchnera.fasta /omaha-beach/cguyomar/genomecov/buchnera/*.buchnera.bam <span class="op">&gt;</span> buchnera.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  buchnera.bcf <span class="op">&gt;</span> buchnera_called.vcf 
+<span class="ex">vcftools</span> --vcf buchnera_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out buchnera_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> buchnera_vcftools.recode.vcf <span class="op">&gt;</span> buchnera.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> buchnera.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/buchnera\///g&#39;</span> buchnera.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.buchnera.bam:DPR//g&#39;</span> buchnera.DPRtab</code></pre></div>
+</div>
+<div id="hamiltonella" class="section level5">
+<h5>Hamiltonella</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -v -f hamiltonella.fasta /omaha-beach/cguyomar/genomecov/hamiltonella/*.hamiltonella.bam <span class="op">&gt;</span> hamiltonella.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  hamiltonella.bcf <span class="op">&gt;</span> hamiltonella_called.vcf 
+<span class="ex">vcftools</span> --vcf hamiltonella_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out hamiltonella_vcftools --recode-INFO-all --recode 
+
+<span class="co">#Adding outgroup</span>
+<span class="ex">bgzip</span> -f hamiltonella_bemisia.vcf
+<span class="ex">tabix</span> -f hamiltonella_bemisia.vcf.gz
+<span class="ex">bgzip</span> -f hamiltonella_vcftools.recode.vcf 
+<span class="ex">tabix</span> -f hamiltonella_vcftools.recode.vcf.gz 
+<span class="ex">vcf-merge</span>  hamiltonella_vcftools.recode.vcf.gz hamiltonella_bemisia.vcf.gz <span class="op">&gt;</span> merged.vcf
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> merged.vcf <span class="op">&gt;</span> hamiltonella.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> hamiltonella.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/hamiltonella\///g&#39;</span> hamiltonella.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.hamiltonella.bam:DPR//g&#39;</span> hamiltonella.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/ \./ 10,0/g&#39;</span> hamiltonella.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\. /10,0 /g&#39;</span> hamiltonella.DPRtab
+<span class="fu">sed</span> -i -e  <span class="st">&#39;s/\[.\{1,2\}\]sample1:DPR/Hbemisia/g&#39;</span> hamiltonella.DPRtab</code></pre></div>
+</div>
+<div id="regiella" class="section level5">
+<h5>Regiella</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+    
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f regiella.fasta /omaha-beach/cguyomar/genomecov/regiella/*.regiella.bam <span class="op">&gt;</span> regiella.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  regiella.bcf <span class="op">&gt;</span> regiella_called.vcf 
+<span class="ex">vcftools</span> --vcf regiella_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out regiella_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Merge with vcf from outgroup mummer alignment</span>
+<span class="ex">bgzip</span> regiella_vcftools.recode.vcf
+<span class="ex">tabix</span> regiella_vcftools.recode.vcf.gz
+<span class="ex">bgzip</span> regiella_hamiltonella.vcf
+<span class="ex">tabix</span> regiella_hamiltonella.vcf.gz
+<span class="ex">vcf-merge</span> regiella_vcftools.recode.vcf.gz regiella_hamiltonella.vcf.gz <span class="op">&gt;</span> merged.vcf
+
+<span class="co"># Extracting DPR and cleaning</span>
+
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> merged.vcf <span class="op">&gt;</span> regiella.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> regiella.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/regiella\///g&#39;</span> regiella.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.regiella.bam:DPR//g&#39;</span> regiella.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/ \./ 10,0/g&#39;</span> regiella.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\. /10,0 /g&#39;</span> regiella.DPRtab
+<span class="fu">sed</span> -i -e  <span class="st">&#39;s/\[.\{1,2\}\]sample1:DPR/Hdefensa/g&#39;</span> regiella.DPRtab</code></pre></div>
+</div>
+<div id="serratia" class="section level5">
+<h5>Serratia</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+    
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f serratia.fasta /omaha-beach/cguyomar/genomecov/serratia/*.serratia.bam <span class="op">&gt;</span> serratia.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  serratia.bcf <span class="op">&gt;</span> serratia_called.vcf 
+<span class="ex">vcftools</span> --vcf serratia_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out serratia_vcftools --recode-INFO-all --recode
+
+<span class="co"># Merge with vcf from outgroup mummer alignment</span>
+<span class="ex">bgzip</span> serratia_vcftools.recode.vcf
+<span class="ex">tabix</span> serratia_vcftools.recode.vcf.gz
+<span class="ex">bgzip</span> serratia_Sct.vcf
+<span class="ex">tabix</span> serratia_Sct.vcf.gz
+<span class="ex">vcf-merge</span> serratia_vcftools.recode.vcf.gz serratia_Sct.vcf.gz <span class="op">&gt;</span> merged.vcf
+
+<span class="co"># Extracting DPR and cleaning</span>
+
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> merged.vcf <span class="op">&gt;</span> serratia.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> serratia.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/serratia\///g&#39;</span> serratia.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.serratia.bam:DPR//g&#39;</span> serratia.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/ \./ 10,0/g&#39;</span> serratia.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\. /10,0 /g&#39;</span> serratia.DPRtab
+<span class="fu">sed</span> -i -e  <span class="st">&#39;s/\[.\{1,2\}\]sample1:DPR/Sct/g&#39;</span> serratia.DPRtab</code></pre></div>
+</div>
+<div id="fukatsuia" class="section level5">
+<h5>Fukatsuia</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+    
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f fukatsuia.fasta /omaha-beach/cguyomar/genomecov/fukatsuia/*.fukatsuia.bam <span class="op">&gt;</span> fukatsuia.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  fukatsuia.bcf <span class="op">&gt;</span> fukatsuia_called.vcf 
+<span class="ex">vcftools</span> --vcf fukatsuia_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out fukatsuia_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Merge with vcf from outgroup mummer alignment</span>
+<span class="ex">bgzip</span> -f fukatsuia_vcftools.recode.vcf
+<span class="ex">tabix</span> -f fukatsuia_vcftools.recode.vcf.gz
+<span class="ex">bgzip</span> -f fukatsuia_regiella.vcf
+<span class="ex">tabix</span> -f fukatsuia_regiella.vcf.gz
+
+<span class="ex">vcf-merge</span> fukatsuia_vcftools.recode.vcf.gz fukatsuia_regiella.vcf.gz <span class="op">&gt;</span> merged.vcf
+
+<span class="co"># Extracting DPR and cleaning</span>
+
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> merged.vcf <span class="op">&gt;</span> fukatsuia.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> fukatsuia.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/fukatsuia\///g&#39;</span> fukatsuia.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.fukatsuia.bam:DPR//g&#39;</span> fukatsuia.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/ \./ 10,0/g&#39;</span> fukatsuia.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\. /10,0 /g&#39;</span> fukatsuia.DPRtab
+
+<span class="fu">sed</span> -i -e  <span class="st">&#39;s/\[.\{1,2\}\]sample1:DPR/Regiella/g&#39;</span> fukatsuia.DPRtab</code></pre></div>
+</div>
+<div id="spiroplasma" class="section level5">
+<h5>Spiroplasma</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools-1.6.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="ex">samtools</span> mpileup -t DP,DPR -v -f spiroplasma2.fasta /omaha-beach/cguyomar/genomecov/spiroplasma/*.spiroplasma.bam <span class="op">&gt;</span> spiroplasma.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  spiroplasma.bcf <span class="op">&gt;</span> spiroplasma_called.vcf 
+<span class="ex">vcftools</span> --vcf spiroplasma_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out spiroplasma_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> spiroplasma_vcftools.recode.vcf <span class="op">&gt;</span> spiroplasma.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> spiroplasma.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/spiroplasma\///g&#39;</span> spiroplasma.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.spiroplasma.bam:DPR//g&#39;</span> spiroplasma.DPRtab</code></pre></div>
+</div>
+<div id="rickettsia" class="section level5">
+<h5>Rickettsia</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f rickettsia.fasta /omaha-beach/cguyomar/genomecov/rickettsia/*.rickettsia.bam <span class="op">&gt;</span> rickettsia.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  rickettsia.bcf <span class="op">&gt;</span> rickettsia_called.vcf 
+<span class="ex">vcftools</span> --vcf rickettsia_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out rickettsia_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Merge with vcf from outgroup mummer alignment</span>
+<span class="ex">bgzip</span> -f rickettsia_vcftools.recode.vcf
+<span class="ex">tabix</span> -f rickettsia_vcftools.recode.vcf.gz
+<span class="ex">bgzip</span> -f rickettsia_bemisia.vcf
+<span class="ex">tabix</span> -f rickettsia_bemisia.vcf.gz
+<span class="ex">vcf-merge</span> rickettsia_vcftools.recode.vcf.gz rickettsia_bemisia.vcf.gz <span class="op">&gt;</span> merged.vcf
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> merged.vcf <span class="op">&gt;</span> rickettsia.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> rickettsia.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/rickettsia\///g&#39;</span> rickettsia.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.rickettsia.bam:DPR//g&#39;</span> rickettsia.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/ \./ 10,0/g&#39;</span> rickettsia.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\. /10,0 /g&#39;</span> rickettsia.DPRtab
+<span class="fu">sed</span> -i -e  <span class="st">&#39;s/\[.\{1,2\}\]sample1:DPR/Rbemisia/g&#39;</span> rickettsia.DPRtab</code></pre></div>
+</div>
+<div id="rickettsiella" class="section level5">
+<h5>Rickettsiella</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -g -f rickettsiella.fasta /omaha-beach/cguyomar/genomecov/rickettsiella/*.rickettsiella.bam <span class="op">&gt;</span> rickettsiella.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  rickettsiella.bcf <span class="op">&gt;</span> rickettsiella_called.vcf 
+<span class="ex">vcftools</span> --vcf rickettsiella_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out rickettsiella_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> rickettsiella_vcftools.recode.vcf <span class="op">&gt;</span> rickettsiella.DPRtab
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> rickettsiella.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/rickettsiella\///g&#39;</span> rickettsiella.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.rickettsiella.bam:DPR//g&#39;</span> rickettsiella.DPRtab</code></pre></div>
+</div>
+<div id="mitochondrion" class="section level5">
+<h5>Mitochondrion</h5>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+<span class="bu">source</span> /local/env/envbcftools-1.3.sh
+<span class="bu">source</span> /local/env/envvcftools-0.1.12b.sh
+
+<span class="co"># Pileup</span>
+<span class="ex">samtools</span> mpileup -t DP,DPR -v -f mitochondrion.fasta /omaha-beach/cguyomar/genomecov/mitochondrie/*.mito.bam <span class="op">&gt;</span> mitochondrie.bcf
+
+<span class="co"># Filtering</span>
+<span class="ex">bcftools</span> call -mv -Ov  mitochondrie.bcf <span class="op">&gt;</span> mitochondrie_called.vcf 
+<span class="ex">vcftools</span> --vcf mitochondrie_called.vcf --max-alleles 2 --min-meanDP 10 --minDP 2 --max-missing 1 --out mitochondrie_vcftools --recode-INFO-all --recode 
+
+<span class="co"># Extracting DPR and cleaning</span>
+<span class="ex">bcftools</span> query -H -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\t[%DPR ]\n&#39;</span> mitochondrie_vcftools.recode.vcf <span class="op">&gt;</span> mitochondrie.DPRtab
+
+<span class="fu">sed</span> -i -e <span class="st">&#39;s/\#//&#39;</span> mitochondrie.DPRtab
+<span class="fu">sed</span>   -i -e  <span class="st">&#39;s/\[.\{1,2\}\]\/omaha-beach\/cguyomar\/genomecov\/mitochondrie\///g&#39;</span> mitochondrie.DPRtab
+<span class="fu">sed</span>  -i -e <span class="st">&#39;s/.mitochondrie.bam:DPR//g&#39;</span> mitochondrie.DPRtab</code></pre></div>
+</div>
+</div>
+<div id="section" class="section level4">
+<h4></h4>
+<div id="adding-outgroup" class="section level5">
+<h5> Adding outgroup</h5>
+<p>In order to insert an outgroup reference genome as a sample in the vcf file, the outgroup genome is aligned with the reference genome with <code>mummer</code>.</p>
+<p>The resulting mummer alignment is converted to a vcf file, which is merged to the main vcf.</p>
+<p>Commands for outgroup vcf creation :</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="co"># $1 :ref genome</span>
+<span class="co"># $2 : aligned genome</span>
+<span class="co"># $3 :prefix </span>
+
+<span class="ex">nucmer</span> -p <span class="va">$3</span> <span class="va">$1</span> <span class="va">$2</span>
+<span class="ex">show-snps</span> -Clr -x 1  -T <span class="va">$3</span>.delta  <span class="op">&gt;</span> <span class="va">$3</span>.snps
+<span class="ex">python</span> ~/bin/MUMmerSNPs2VCF_DPR.py  <span class="va">$3</span>.snps <span class="va">$3</span>.vcf</code></pre></div>
+<p><code>MUMmerSNPs2VCF_DPR.py</code> is a version of <code>MUMmerSNPs2VCF_DPR.py</code> (<a href="https://github.com/liangjiaoxue/PythonNGSTools" class="uri">https://github.com/liangjiaoxue/PythonNGSTools</a>) modified to add arbitrary read coverage information (DPR tag) to fit the pipeline.</p>
+</div>
+</div>
+<div id="cleaning-output" class="section level4">
+<h4>Cleaning output</h4>
+<p>Allele coverage file are parsed using the script <code>cleaning.R</code> <a href="./scripts/cleaning.R">(script)</a></p>
+<p>The following filters are applied for each sample :</p>
+<ul>
+<li>Alleles covered with less or equal than 3 reads are removed</li>
+<li>Alleles with a frequency inferior to 10% are removed</li>
+<li>For Hamiltonella, Regiella and Fukatsuia, variants located in a region of blast identity greater than 80% are removed</li>
+<li>Samples for which more than 5% of variants are equally covered are removed. This concerns samples with low coverage and high polymorphism</li>
+</ul>
+</div>
+</div>
+<div id="genome-wide-phylogeny-using-neighbor-joining" class="section level2">
+<h2>Genome wide phylogeny using neighbor-joining</h2>
+<p>Performed using <code>nj_phylogeny.R</code> <a href="./scripts/nj_phylogeny.r">(script)</a>, can be run with command line : <code>Rscript nj_phylogeny.R symbiont</code></p>
+<p>Main steps :</p>
+<ul>
+<li>Load filtered allele coverage file and reconstruct associated tables</li>
+<li>Assign allele for each site and sample (most covered allele)</li>
+<li>Compute distance matrix</li>
+<li>Perform neighbor joining and return a phylogenetic tree</li>
+<li>Plot and save data</li>
+</ul>
+</div>
+<div id="gene-set-phylogeny-using-maximumum-likelyhood-based-inference" class="section level2">
+<h2>Gene-set phylogeny using maximumum likelyhood based inference</h2>
+<p>This second approach is used when an annotated reference genome is available.</p>
+<div id="search-of-membrane-specific-proteins" class="section level3">
+<h3>Search of membrane specific proteins</h3>
+<ul>
+<li>Query of membrane specific protein on UniProt, the ‘transcript’ field is saved.</li>
+<li>Transcript IDs are converted with <code>esearch</code> and <code>efetch</code> utilities to the ipg format (identical protein groups), which contains the gene coordinates on the genome.</li>
+</ul>
+</div>
+<div id="computing-gene-sequences-for-each-sample" class="section level3">
+<h3>Computing gene sequences for each sample</h3>
+<p>This step is performed by the <code>gene_phylogeny.R</code> <a href="./scripts/gene_phylogeny.R">script</a> and <a href="./scripts/gene_phylogeny_fun.R">associated functions</a></p>
+<p>Main steps :</p>
+<ul>
+<li>Loading cleaned allele coverage</li>
+<li>Merging overlaping indels, which cannot be applied simultaneously</li>
+<li>Reading selected genes from a directory (one file per ipg), and removing duplicates</li>
+<li>Computing gene sequences for each sample using <code>get_alt_seq</code> function</li>
+<li>Output resulting fasta file</li>
+</ul>
+</div>
+<div id="phylogenetic-analyses" class="section level3">
+<h3>Phylogenetic analyses</h3>
+<p>Each fasta file is aligned using MAFFT (version 7.310)</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="fu">file</span> in *.fasta <span class="kw">;</span> <span class="kw">do</span> <span class="ex">linsi</span> <span class="va">$file</span> <span class="op">&gt;</span> <span class="va">$file</span>.aligned <span class="kw">;</span> <span class="kw">done</span></code></pre></div>
+<p>Aligned fasta files are concatenated using ElConcatenero (<a href="https://github.com/ODiogoSilva/ElConcatenero" class="uri">https://github.com/ODiogoSilva/ElConcatenero</a>)</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ElConcatenero.py</span> -if fasta -of fasta -in *.aligned -o concatenation</code></pre></div>
+<p>RaxML is then used to infer the phylogenetic tree</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">raxml</span> -f a -# 1000 -m GTRGAMMA -s concatenation.fas.reduced -n symbiont_raxml</code></pre></div>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

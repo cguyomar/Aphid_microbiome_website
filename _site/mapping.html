@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Mapping step</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Mapping on reference genome set
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="mapping.html">Scripts</a>
+    </li>
+    <li>
+      <a href="mapping_results.html">Mapping table</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Unmapped analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="unmapped.html">Scripts</a>
+    </li>
+    <li>
+      <a href="by_sample-report.html">Centrifuge results by sample</a>
+    </li>
+    <li>
+      <a href="all-report.html">Centrifuge results pooled</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="phylogeny.html">Phylogenetic analysis</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Mapping step</h1>
+
+</div>
+
+
+<div id="datasets" class="section level1">
+<h1>Datasets</h1>
+<p>Three sets of samples were used :</p>
+<ul>
+<li>33 individual resequencing from 11 biotypes</li>
+<li>12 pool sequencing from 12 biotypes</li>
+<li>6 pool sequencing from the <em>Medicago sativa</em> biotype, from the <em>sex-asex</em> experiment</li>
+</ul>
+<p><strong>Remarks :</strong></p>
+<ul>
+<li>All read sets are 2*100bp paired end Illumina reads</li>
+<li>Two technical replicates are available for each sex_asex sample and 3 poolseq samples (Pea, Alflalfa and Clover). They are merged downstream in the analysis</li>
+<li>Samples names were changed for the readability of the paper</li>
+<li>L20Cs02</li>
+</ul>
+<div id="summary-of-samples-and-biotypes" class="section level2">
+<h2>Summary of samples and biotypes</h2>
+<p>-&gt; Insert table</p>
+</div>
+</div>
+<div id="mapping-step" class="section level1">
+<h1>Mapping step</h1>
+<ul>
+<li>Mapping is performed using bwa-mem (version 0.7.10)</li>
+<li>Bwa index :</li>
+</ul>
+<p>Summary of genomes used for building bwa index:</p>
+<p>index is located in <code>/omaha-beach/cguyomar/ref_genome/ref_genome_review</code></p>
+<ul>
+<li>Mapping script :</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envbwa-0.7.10.sh
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="co"># $1 and $2 : paired end libraries</span>
+<span class="co"># $3 : outname</span>
+<span class="co"># $4 number of threads</span>
+
+<span class="bu">echo</span> <span class="st">&quot;processed file : &quot;</span> <span class="va">$3</span>
+<span class="ex">bwa</span> mem -t <span class="va">$4</span> /omaha-beach/cguyomar/ref_genome/ref_genome_review <span class="va">$1</span> <span class="va">$2</span> <span class="kw">|</span> <span class="ex">samtools</span> view -b - <span class="op">&gt;</span> <span class="va">$3</span>.bam
+
+<span class="ex">samtools</span> sort -@ <span class="va">$4</span> <span class="va">$3</span>.bam <span class="va">$3</span>_sorted
+<span class="fu">mv</span> <span class="va">$3</span>_sorted.bam <span class="va">$3</span>.bam
+
+<span class="ex">samtools</span> index <span class="va">$3</span>.bam
+<span class="ex">samtools</span> flagstat <span class="va">$3</span>.bam <span class="op">&gt;</span> <span class="va">$3</span>.flagstat</code></pre></div>
+<div id="batch-submission-of-mapping-jobs" class="section level3">
+<h3>Batch submission of mapping jobs</h3>
+<ul>
+<li>3 files of files contain the location of read sets and sample names (see <code>/omaha-beach/cguyomar/fof_speciaphid/</code>)</li>
+</ul>
+<p>Script for batch submission</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="co"># $1 : fof location</span>
+<span class="co"># $2 : number of threads for each job</span>
+
+<span class="kw">while</span> <span class="bu">read</span> <span class="va">line</span>
+  <span class="kw">do</span>
+    <span class="bu">read</span> <span class="va">file1</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f1<span class="va">)</span>
+    <span class="bu">read</span> <span class="va">matefile</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f2<span class="va">)</span>
+    <span class="bu">read</span> <span class="va">ID</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f3<span class="va">)</span>
+    <span class="ex">qsub</span> -pe make <span class="va">$2</span> -cwd ~/scripts/mapping_bwa_gz_multi.sh <span class="va">$file1</span> <span class="va">$matefile</span> <span class="va">$ID</span> <span class="va">$2</span>
+  <span class="kw">done</span> <span class="op">&lt;</span> <span class="va">$1</span></code></pre></div>
+<p><strong>Warning</strong> : High disk usage when submitting all mapping jobs in parrallel.</p>
+<p>Samples with technical replicates are merged at this point :</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="ex">samtools</span> merge Pea.bam Pea_L*.bam
+<span class="ex">samtools</span> merge Alfalfa Alfalfa_L*.bam
+<span class="ex">samtools</span> merge Clover.bam Clover_L*.bam
+<span class="ex">samtools</span> merge Cast.bam Cast*.bam
+<span class="ex">samtools</span> merge Gers.bam Gers*.bam
+<span class="ex">samtools</span> merge Lus.bam Lus*.bam
+<span class="ex">samtools</span> merge Mil.bam Mil*.bal
+<span class="ex">samtools</span> merge Vl.bam Vl*.bam
+<span class="ex">samtools</span> merge Sl.bam Sl*.bam
+
+<span class="fu">rm</span> Alfalfa_L*
+<span class="fu">rm</span> Clover_L*
+<span class="fu">rm</span> Pea_L*
+<span class="fu">rm</span> Cast04*
+<span class="fu">rm</span> Cast10*
+<span class="fu">rm</span> Gers05*
+<span class="fu">rm</span> Gers11*
+<span class="fu">rm</span> Lus06*
+<span class="fu">rm</span> Lus12*
+<span class="fu">rm</span> Mil01*
+<span class="fu">rm</span> Mil07*
+<span class="fu">rm</span> Vl03*
+<span class="fu">rm</span> Vl09*
+<span class="fu">rm</span> Sl02*
+<span class="fu">rm</span> Sl09*
+
+<span class="ex">samtools</span> index Pea.bam
+<span class="ex">samtools</span> index Alfalfa 
+<span class="ex">samtools</span> index Clover.bam
+<span class="ex">samtools</span> index Cast.bam
+<span class="ex">samtools</span> index Gers.bam
+<span class="ex">samtools</span> index Lus.bam
+<span class="ex">samtools</span> index Mil.bam
+<span class="ex">samtools</span> index Vl.bam 
+<span class="ex">samtools</span> index Sl.bam </code></pre></div>
+<p>Resulting bam files are stored in <code>/groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA</code></p>
+</div>
+<div id="coverage-for-each-symbiont" class="section level3">
+<h3>Coverage for each symbiont</h3>
+<p><code>comptage.sh</code> is used to get the coverage of a given bam file for each reference organism - Each indexed bam file is querried using <code>samtools idxstats</code> to get the number of reads mapping on each contig of the reference set - The results is joined with a custom table indicating the organisms associated to each contig and formatted</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="va">filename=$(</span><span class="fu">basename</span> <span class="va">$1)</span>
+<span class="va">outname=$(</span><span class="bu">echo</span> <span class="va">$filename</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot;.&quot;</span> -f1<span class="va">)</span>
+
+<span class="ex">samtools</span> idxstats <span class="va">$1</span> <span class="kw">|</span> <span class="fu">sort</span> -k 1b,1  <span class="op">&gt;</span> <span class="va">$outname</span>.idxstats
+<span class="fu">join</span> <span class="va">$outname</span>.idxstats /omaha-beach/cguyomar/scaffolds_review.list <span class="op">&gt;</span> <span class="va">$outname</span>.scaff.comptage
+<span class="fu">awk</span> <span class="st">&#39;{SUM+=$4} END {print &quot;unmapped &quot;SUM}&#39;</span> <span class="va">$outname</span>.idxstats <span class="op">&gt;&gt;</span> <span class="va">$outname</span>.scaff.comptage
+<span class="fu">awk</span> <span class="st">&#39;{a[$5]+=$3}END{for (i in a) print i,a[i]}&#39;</span> <span class="va">$outname</span>.scaff.comptage <span class="kw">|</span> <span class="fu">sed</span> 1d <span class="op">&gt;</span> <span class="va">$outname</span>.symb.comptage
+<span class="fu">awk</span> <span class="st">&#39;{SUM+=$4} END {print &quot;unmapped &quot;SUM}&#39;</span> <span class="va">$outname</span>.idxstats <span class="op">&gt;&gt;</span> <span class="va">$outname</span>.symb.comptage</code></pre></div>
+<p>batch submission :</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="fu">file</span> in /groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA/33genomes_review/*.bam
+  <span class="kw">do</span> <span class="ex">qsub</span> -cwd ~/scripts/comptage.sh <span class="va">$file</span>
+<span class="kw">done</span>
+
+<span class="kw">for</span> <span class="fu">file</span> in /groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA/poolseq_review/*.bam
+  <span class="kw">do</span> <span class="ex">qsub</span> -cwd ~/scripts/comptage.sh <span class="va">$file</span>
+<span class="kw">done</span>
+
+<span class="kw">for</span> <span class="fu">file</span> in /groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA/sex_asex_review/*.bam
+  <span class="kw">do</span> <span class="ex">qsub</span> -cwd ~/scripts/comptage.sh <span class="va">$file</span>
+<span class="kw">done</span>
+
+<span class="kw">for</span> <span class="fu">file</span> in /groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA/japonais_review/*.bam
+  <span class="kw">do</span> <span class="ex">qsub</span> -cwd ~/scripts/comptage.sh <span class="va">$file</span>
+<span class="kw">done</span></code></pre></div>
+<p>Counts for each sample are then merged in a single tab, and sorted in the paper order</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envR.sh
+
+<span class="bu">echo</span> Symbiote <span class="op">&gt;</span> left
+<span class="fu">cut</span> -f1 -d <span class="st">&quot; &quot;</span> ArPo28.symb.comptage <span class="op">&gt;&gt;</span> left
+
+<span class="kw">for</span> <span class="fu">file</span> in *.symb.comptage
+  <span class="kw">do</span> <span class="bu">echo</span> <span class="va">${file%%</span>.*<span class="va">}</span> <span class="op">&gt;</span> <span class="va">$file</span>.symb.temp
+  <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f2 <span class="va">$file</span> <span class="op">&gt;&gt;</span> <span class="va">$file</span>.symb.temp    
+<span class="kw">done</span>
+<span class="ex">paste</span> -d <span class="st">&quot;;&quot;</span> left  *.symb.temp <span class="op">&gt;</span> symb.comptages
+
+<span class="fu">rm</span> left
+<span class="fu">rm</span> *.temp
+
+<span class="ex">Rscript</span> sort_tab.R</code></pre></div>
+<p>Output : A csv table giving the number of reads mapped on each reference genome for each sample (symb.comptages.sorted)</p>
+</div>
+<div id="splitting-bam-files" class="section level3">
+<h3>Splitting bam files</h3>
+<p><code>split_bam.sh</code> can be used to generate a bam file of reads mapping on a specific reference genome for each sample</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="va">filename=$(</span><span class="fu">basename</span> <span class="va">$1)</span>
+<span class="va">outname=$(</span><span class="bu">echo</span> <span class="va">$filename</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot;.&quot;</span> -f1<span class="va">)</span>
+
+<span class="ex">samtools</span> view -b <span class="va">$1</span> APSE1_ENA<span class="dt">\|</span>AF157835<span class="dt">\|</span>AF157835.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/APSE1/<span class="va">$outname</span>.APSE1.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Buchnera_gi15616630refNC_002528.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/buchnera/<span class="va">$outname</span>.buchnera.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Hamiltonella_gi238897251refNC_012751.<span class="op">1&gt;</span> /omaha-beach/cguyomar/genomecov/hamiltonella/<span class="va">$outname</span>.hamiltonella.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Mitochondrion_gi213948225refNC_011594.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/mitochondrie/<span class="va">$outname1</span>.mito.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/regiella/regiella.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/regiella/<span class="va">$outname</span>.regiella.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/ref_genome/genomes/rickettsia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/rickettsia/<span class="va">$outname</span>.rickettsia.
+<span class="ex">bam</span>
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Rickettsiella_viridis <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/rickettsiella/<span class="va">$outname</span>.rickettsiella.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/serratia/serratia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/serratia/<span class="va">$outname</span>.serratia.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/spiroplasma/spiro.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/spiroplasma/<span class="va">$outname</span>.spiroplasma.
+<span class="ex">bam</span> 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/ref_genome/genomes/fukatsuia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/fukatsuia/<span class="va">$outname</span>.fukatsuia.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span>.bam Mitochondrion_gi213948225refNC_011594.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/mitochondrie/<span class="va">$1</span>.mito.bam</code></pre></div>
+<ul>
+<li>Compute covered fraction of the genome</li>
+</ul>
+<p>Samples with insufficient coverage are removed manually.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
