@@ -700,7 +700,7 @@ div.tocify {
 <p>Aligned fasta files are concatenated using ElConcatenero (<a href="https://github.com/ODiogoSilva/ElConcatenero" class="uri">https://github.com/ODiogoSilva/ElConcatenero</a>)</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ElConcatenero.py</span> -if fasta -of fasta -in *.aligned -o concatenation</code></pre></div>
 <p>RaxML is then used to infer the phylogenetic tree</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">raxml</span> -f a -# 1000 -m GTRGAMMA -s concatenation.fas.reduced -n symbiont_raxml</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">raxml</span> -f a -# 1000 -x 123 -p 123 -m GTRGAMMA -s concatenation.fas.reduced -n symbiont_raxml</code></pre></div>
 </div>
 </div>
 </div>
