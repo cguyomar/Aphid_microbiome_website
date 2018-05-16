@@ -381,7 +381,7 @@ div.tocify {
 <h1>Datasets</h1>
 <p>Three sets of samples were used :</p>
 <ul>
-<li>33 individual resequencing from 11 biotypes</li>
+<li>32 individual resequencing from 11 biotypes</li>
 <li>12 pool sequencing from 12 biotypes</li>
 <li>6 pool sequencing from the <em>Medicago sativa</em> biotype, from the <em>sex-asex</em> experiment</li>
 </ul>
@@ -390,7 +390,6 @@ div.tocify {
 <li>All read sets are 2*100bp paired end Illumina reads</li>
 <li>Two technical replicates are available for each sex_asex sample and 3 poolseq samples (Pea, Alflalfa and Clover). They are merged downstream in the analysis</li>
 <li>Samples names were changed for the readability of the paper</li>
-<li>L20Cs02</li>
 </ul>
 <div id="summary-of-samples-and-biotypes" class="section level2">
 <h2>Summary of samples and biotypes</h2>
@@ -401,7 +400,6 @@ div.tocify {
 <h1>Mapping step</h1>
 <ul>
 <li>Mapping is performed using bwa-mem (version 0.7.10)</li>
-<li>Bwa index :</li>
 </ul>
 <p>Summary of genomes used for building bwa index:</p>
 <p>index is located in <code>/omaha-beach/cguyomar/ref_genome/ref_genome_review</code></p>
@@ -502,10 +500,12 @@ div.tocify {
 <h3>Splitting bam files</h3>
 <p><code>split_bam.sh</code> can be used to generate a bam file of reads mapping on a specific reference genome for each sample</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
-<ul>
-<li>Compute covered fraction of the genome</li>
-</ul>
 <p>Samples with insufficient coverage are removed manually.</p>
+<ul>
+<li>One liner to compute covered fraction of the genome :</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">samtools</span> depth <span class="va">$sample</span>  <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;$3 &gt; 2&#39;</span> <span class="kw">|</span> <span class="fu">wc</span> -l</code></pre></div>
+<p>Samples with coverage greater than 10X but with less than 70% of the genome covered are removed.</p>
 </div>
 </div>
 
