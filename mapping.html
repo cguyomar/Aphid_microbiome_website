@@ -402,14 +402,41 @@ div.tocify {
 <ul>
 <li>Mapping script :</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envbwa-0.7.10.sh
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="co"># $1 and $2 : paired end libraries</span>
+<span class="co"># $3 : outname</span>
+<span class="co"># $4 number of threads</span>
+
+<span class="bu">echo</span> <span class="st">&quot;processed file : &quot;</span> <span class="va">$3</span>
+<span class="ex">bwa</span> mem -t <span class="va">$4</span> /omaha-beach/cguyomar/ref_genome/ref_genome_review <span class="va">$1</span> <span class="va">$2</span> <span class="kw">|</span> <span class="ex">samtools</span> view -b - <span class="op">&gt;</span> <span class="va">$3</span>.bam
+
+<span class="ex">samtools</span> sort -@ <span class="va">$4</span> <span class="va">$3</span>.bam <span class="va">$3</span>_sorted
+<span class="fu">mv</span> <span class="va">$3</span>_sorted.bam <span class="va">$3</span>.bam
+
+<span class="ex">samtools</span> index <span class="va">$3</span>.bam
+<span class="ex">samtools</span> flagstat <span class="va">$3</span>.bam <span class="op">&gt;</span> <span class="va">$3</span>.flagstat</code></pre></div>
 <div id="batch-submission-of-mapping-jobs" class="section level3">
 <h3>Batch submission of mapping jobs</h3>
 <ul>
 <li>3 files of files contain the location of read sets and sample names (see <code>/omaha-beach/cguyomar/fof_speciaphid/</code>)</li>
 </ul>
 <p>Script for batch submission</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="co"># $1 : fof location</span>
+<span class="co"># $2 : number of threads for each job</span>
+
+<span class="kw">while</span> <span class="bu">read</span> <span class="va">line</span>
+  <span class="kw">do</span>
+    <span class="bu">read</span> <span class="va">file1</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f1<span class="va">)</span>
+    <span class="bu">read</span> <span class="va">matefile</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f2<span class="va">)</span>
+    <span class="bu">read</span> <span class="va">ID</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$(</span><span class="bu">echo</span> <span class="va">$line</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot; &quot;</span> -f3<span class="va">)</span>
+    <span class="ex">qsub</span> -pe make <span class="va">$2</span> -cwd ~/scripts/mapping_bwa_gz_multi.sh <span class="va">$file1</span> <span class="va">$matefile</span> <span class="va">$ID</span> <span class="va">$2</span>
+  <span class="kw">done</span> <span class="op">&lt;</span> <span class="va">$1</span></code></pre></div>
 <p><strong>Warning</strong> : High disk usage when submitting all mapping jobs in parrallel.</p>
 <p>Samples with technical replicates are merged at this point :</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
@@ -455,7 +482,18 @@ div.tocify {
 <div id="coverage-for-each-symbiont" class="section level3">
 <h3>Coverage for each symbiont</h3>
 <p><code>comptage.sh</code> is used to get the coverage of a given bam file for each reference organism - Each indexed bam file is querried using <code>samtools idxstats</code> to get the number of reads mapping on each contig of the reference set - The results is joined with a custom table indicating the organisms associated to each contig and formatted</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="va">filename=$(</span><span class="fu">basename</span> <span class="va">$1)</span>
+<span class="va">outname=$(</span><span class="bu">echo</span> <span class="va">$filename</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot;.&quot;</span> -f1<span class="va">)</span>
+
+<span class="ex">samtools</span> idxstats <span class="va">$1</span> <span class="kw">|</span> <span class="fu">sort</span> -k 1b,1  <span class="op">&gt;</span> <span class="va">$outname</span>.idxstats
+<span class="fu">join</span> <span class="va">$outname</span>.idxstats /omaha-beach/cguyomar/scaffolds_review.list <span class="op">&gt;</span> <span class="va">$outname</span>.scaff.comptage
+<span class="fu">awk</span> <span class="st">&#39;{SUM+=$4} END {print &quot;unmapped &quot;SUM}&#39;</span> <span class="va">$outname</span>.idxstats <span class="op">&gt;&gt;</span> <span class="va">$outname</span>.scaff.comptage
+<span class="fu">awk</span> <span class="st">&#39;{a[$5]+=$3}END{for (i in a) print i,a[i]}&#39;</span> <span class="va">$outname</span>.scaff.comptage <span class="kw">|</span> <span class="fu">sed</span> 1d <span class="op">&gt;</span> <span class="va">$outname</span>.symb.comptage
+<span class="fu">awk</span> <span class="st">&#39;{SUM+=$4} END {print &quot;unmapped &quot;SUM}&#39;</span> <span class="va">$outname</span>.idxstats <span class="op">&gt;&gt;</span> <span class="va">$outname</span>.symb.comptage</code></pre></div>
 <p>batch submission :</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="fu">file</span> in /groups/bipaa/ref/Hemiptera/Acyrthosiphon_pisum/Speciaphid/BAMs_bwa/MAPPED_BWA/33genomes_review/*.bam
   <span class="kw">do</span> <span class="ex">qsub</span> -cwd ~/scripts/comptage.sh <span class="va">$file</span>
@@ -495,7 +533,26 @@ div.tocify {
 <div id="splitting-bam-files" class="section level3">
 <h3>Splitting bam files</h3>
 <p><code>split_bam.sh</code> can be used to generate a bam file of reads mapping on a specific reference genome for each sample</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="bu">source</span> /local/env/envsamtools.sh
+
+<span class="va">filename=$(</span><span class="fu">basename</span> <span class="va">$1)</span>
+<span class="va">outname=$(</span><span class="bu">echo</span> <span class="va">$filename</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&quot;.&quot;</span> -f1<span class="va">)</span>
+
+<span class="ex">samtools</span> view -b <span class="va">$1</span> APSE1_ENA<span class="dt">\|</span>AF157835<span class="dt">\|</span>AF157835.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/APSE1/<span class="va">$outname</span>.APSE1.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Buchnera_gi15616630refNC_002528.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/buchnera/<span class="va">$outname</span>.buchnera.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Hamiltonella_gi238897251refNC_012751.<span class="op">1&gt;</span> /omaha-beach/cguyomar/genomecov/hamiltonella/<span class="va">$outname</span>.hamiltonella.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Mitochondrion_gi213948225refNC_011594.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/mitochondrie/<span class="va">$outname1</span>.mito.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/regiella/regiella.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/regiella/<span class="va">$outname</span>.regiella.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/ref_genome/genomes/rickettsia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/rickettsia/<span class="va">$outname</span>.rickettsia.
+<span class="ex">bam</span>
+<span class="ex">samtools</span> view -b <span class="va">$1</span> Rickettsiella_viridis <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/rickettsiella/<span class="va">$outname</span>.rickettsiella.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/serratia/serratia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/serratia/<span class="va">$outname</span>.serratia.bam 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/genomecov/spiroplasma/spiro.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/spiroplasma/<span class="va">$outname</span>.spiroplasma.
+<span class="ex">bam</span> 
+<span class="ex">samtools</span> view -b <span class="va">$1</span> <span class="va">$(</span><span class="fu">cat</span> /omaha-beach/cguyomar/ref_genome/genomes/fukatsuia.contigs<span class="va">)</span> <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/fukatsuia/<span class="va">$outname</span>.fukatsuia.bam
+<span class="ex">samtools</span> view -b <span class="va">$1</span>.bam Mitochondrion_gi213948225refNC_011594.1 <span class="op">&gt;</span> /omaha-beach/cguyomar/genomecov/mitochondrie/<span class="va">$1</span>.mito.bam</code></pre></div>
 <p>Samples with insufficient coverage are removed manually.</p>
 <ul>
 <li>One liner to compute covered fraction of the genome :</li>
